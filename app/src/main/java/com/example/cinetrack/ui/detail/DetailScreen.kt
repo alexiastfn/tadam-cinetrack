@@ -2,6 +2,7 @@ package com.example.cinetrack.ui.detail
 
 import android.content.Intent
 import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -306,27 +307,22 @@ private fun TrailerButton(
 
     Button(
         onClick = {
-            val searchQuery = Uri.encode("$movieTitle trailer")
             val intent = Intent(
                 Intent.ACTION_VIEW,
-                Uri.parse("https://www.youtube.com/results?search_query=$searchQuery")
+                Uri.parse("https://www.google.com/search?q=${Uri.encode("$movieTitle trailer")}")
             )
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             try {
                 context.startActivity(intent)
             } catch (e: Exception) {
-                val googleIntent = Intent(
-                    Intent.ACTION_VIEW,
-                    Uri.parse("https://www.google.com/search?q=${Uri.encode("$movieTitle trailer")}")
-                )
-                context.startActivity(googleIntent)
+                Toast.makeText(context, "Niciun browser disponibil", Toast.LENGTH_SHORT).show()
             }
         },
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
-        Text("▶ Vezi trailer pe YouTube")
+        Text("▶ Cauta trailer")
     }
 }
 
