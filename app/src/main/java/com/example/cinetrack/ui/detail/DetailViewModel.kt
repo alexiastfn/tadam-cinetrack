@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.cinetrack.CineTrackApplication
+import com.example.cinetrack.data.model.CastMember
 import com.example.cinetrack.data.repository.MovieRepository
 import com.example.cinetrack.data.model.TmdbMovie
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,31 +18,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 
-sealed interface DetailUiState {
-    object Loading : DetailUiState
-    data class Success(
-        val movie: TmdbMovie,
-        val isInWatchlist: Boolean = false,
-        val isWatched: Boolean = false
-    ) : DetailUiState
-    data class Error(val message: String) : DetailUiState
-}
-
-data class RatingDialogState(
-    val isVisible: Boolean = false,
-    val rating: Int = 0,
-    val review: String = ""
-)
-
 class DetailViewModel(
     private val repository: MovieRepository,
     private val movieId: Int
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<DetailUiState>(DetailUiState.Loading)
-//    val uiState: StateFlow<DetailUiState> = _uiState.asStateFlow()
-
-    //
 
     private val _movie = MutableStateFlow<TmdbMovie?>(null)
     private val _error = MutableStateFlow<String?>(null)
@@ -74,16 +56,43 @@ class DetailViewModel(
         loadMovieDetails()
     }
 
+    private val _cast = MutableStateFlow<List<CastMember>>(emptyList())
+    val cast: StateFlow<List<CastMember>> = _cast.asStateFlow()
+
+    private val _trailerKey = MutableStateFlow<String?>(null)
+    val trailerKey: StateFlow<String?> = _trailerKey.asStateFlow()
+
+    // in loadMovieDetails(), dupa ce obtii movie:
     private fun loadMovieDetails() {
         viewModelScope.launch {
             try {
                 val movie = repository.getMovieDetails(movieId)
                 _movie.value = movie
+
+                // incarca cast si trailer in paralel
+                launch {
+                    _cast.value = repository.getCredits(movieId)
+                }
+                launch {
+                    _trailerKey.value = repository.getTrailerKey(movieId)
+                }
+
             } catch (e: Exception) {
                 _error.value = e.message ?: "Eroare necunoscuta"
             }
         }
     }
+
+//    private fun loadMovieDetails() {
+//        viewModelScope.launch {
+//            try {
+//                val movie = repository.getMovieDetails(movieId)
+//                _movie.value = movie
+//            } catch (e: Exception) {
+//                _error.value = e.message ?: "Eroare necunoscuta"
+//            }
+//        }
+//    }
 
     fun addToWatchlist() {
         val state = uiState.value as? DetailUiState.Success ?: return

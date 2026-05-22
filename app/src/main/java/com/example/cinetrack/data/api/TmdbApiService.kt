@@ -8,9 +8,11 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 import com.example.cinetrack.BuildConfig
+import com.example.cinetrack.data.model.CreditsResponse
 import com.example.cinetrack.data.model.GenreResponse
 import com.example.cinetrack.data.model.TmdbMovie
 import com.example.cinetrack.data.model.TmdbResponse
+import com.example.cinetrack.data.model.VideosResponse
 
 interface TmdbApiService {
 
@@ -31,5 +33,15 @@ interface TmdbApiService {
 
     @GET("genre/movie/list")
     suspend fun getGenres(): GenreResponse
+
+    @GET("movie/{id}/credits")
+    suspend fun getCredits(
+        @Path("id") id: Int
+    ): CreditsResponse
+
+    @GET("movie/{id}/videos")
+    suspend fun getVideos(
+        @Path("id") id: Int
+    ): VideosResponse
 }
 
