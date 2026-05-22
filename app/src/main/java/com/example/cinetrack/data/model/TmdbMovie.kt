@@ -12,5 +12,7 @@ data class TmdbMovie(
     @SerializedName("release_date")
     val releaseDate: String,
     @SerializedName("vote_average")
-    val voteAverage: Double
+    val voteAverage: Double,
+    @SerializedName("genre_ids")
+    val genreIds: List<Int> = emptyList()
 )
