@@ -6,8 +6,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.cinetrack.CineTrackApplication
-import com.example.cinetrack.data.MovieRepository
-import com.example.cinetrack.data.WatchlistItem
+import com.example.cinetrack.data.repository.MovieRepository
+import com.example.cinetrack.data.db.WatchlistItem
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map

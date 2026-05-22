@@ -1,5 +1,10 @@
-package com.example.cinetrack.data
+package com.example.cinetrack.data.repository
 
+import com.example.cinetrack.data.db.CineTrackDao
+import com.example.cinetrack.data.model.TmdbMovie
+import com.example.cinetrack.data.db.WatchedItem
+import com.example.cinetrack.data.db.WatchlistItem
+import com.example.cinetrack.data.api.TmdbApiService
 import kotlinx.coroutines.flow.Flow
 
 class MovieRepository(

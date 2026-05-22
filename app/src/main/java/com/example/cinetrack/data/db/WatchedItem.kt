@@ -1,4 +1,4 @@
-package com.example.cinetrack.data
+package com.example.cinetrack.data.db
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

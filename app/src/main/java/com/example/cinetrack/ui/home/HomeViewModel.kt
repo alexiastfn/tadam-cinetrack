@@ -6,8 +6,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.cinetrack.CineTrackApplication
-import com.example.cinetrack.data.MovieRepository
-import com.example.cinetrack.data.TmdbMovie
+import com.example.cinetrack.data.repository.MovieRepository
+import com.example.cinetrack.data.model.TmdbMovie
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

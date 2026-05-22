@@ -1,9 +1,12 @@
-package com.example.cinetrack.data
+package com.example.cinetrack.data.db
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.example.cinetrack.data.db.CineTrackDao
+import com.example.cinetrack.data.db.WatchedItem
+import com.example.cinetrack.data.db.WatchlistItem
 
 @Database(
     entities = [WatchlistItem::class, WatchedItem::class],

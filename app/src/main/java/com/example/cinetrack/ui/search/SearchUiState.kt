@@ -1,6 +1,6 @@
 package com.example.cinetrack.ui.search
 
-import com.example.cinetrack.data.TmdbMovie
+import com.example.cinetrack.data.model.TmdbMovie
 
 sealed interface SearchUiState {
     object Idle : SearchUiState          // ecran gol, nicio cautare inca

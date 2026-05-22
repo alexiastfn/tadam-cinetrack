@@ -1,4 +1,4 @@
-package com.example.cinetrack.data
+package com.example.cinetrack.data.db
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -12,7 +12,7 @@ interface CineTrackDao {
 
     // --- Watchlist ---
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.Companion.IGNORE)
     suspend fun addToWatchlist(item: WatchlistItem)
 
     @Delete
@@ -26,7 +26,7 @@ interface CineTrackDao {
 
     // --- Watched ---
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
     suspend fun markAsWatched(item: WatchedItem)
 
     @Delete

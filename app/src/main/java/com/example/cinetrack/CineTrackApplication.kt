@@ -1,9 +1,9 @@
 package com.example.cinetrack
 
 import android.app.Application
-import com.example.cinetrack.data.CineTrackDatabase
-import com.example.cinetrack.data.MovieRepository
-import com.example.cinetrack.data.RetrofitInstance
+import com.example.cinetrack.data.db.CineTrackDatabase
+import com.example.cinetrack.data.repository.MovieRepository
+import com.example.cinetrack.data.api.RetrofitInstance
 
 class CineTrackApplication : Application() {
     val database: CineTrackDatabase by lazy {

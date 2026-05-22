@@ -1,4 +1,4 @@
-package com.example.cinetrack.data
+package com.example.cinetrack.data.model
 
 import com.google.gson.annotations.SerializedName
 
@@ -14,4 +14,3 @@ data class TmdbMovie(
     @SerializedName("vote_average")
     val voteAverage: Double
 )
-
