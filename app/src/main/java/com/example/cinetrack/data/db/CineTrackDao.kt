@@ -16,7 +16,7 @@ interface CineTrackDao {
     suspend fun addToWatchlist(item: WatchlistItem)
 
     @Delete
-    suspend fun removeFromWatchlist(item: WatchlistItem)
+    suspend fun removeFromWatchlist(item: Int)
 
     @Query("SELECT * FROM watchlist ORDER BY addedAt DESC")
     fun getWatchlist(): Flow<List<WatchlistItem>>
@@ -30,7 +30,7 @@ interface CineTrackDao {
     suspend fun markAsWatched(item: WatchedItem)
 
     @Delete
-    suspend fun removeFromWatched(item: WatchedItem)
+    suspend fun removeFromWatched(item: Int)
 
     @Query("SELECT * FROM watched ORDER BY watchedAt DESC")
     fun getWatchedList(): Flow<List<WatchedItem>>
