@@ -81,4 +81,6 @@ dependencies {
 
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging)
+
+    implementation(libs.coil.compose)
 }

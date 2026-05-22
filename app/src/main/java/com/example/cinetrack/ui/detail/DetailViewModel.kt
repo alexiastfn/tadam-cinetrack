@@ -1,0 +1,120 @@
+package com.example.cinetrack.ui.detail
+
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.cinetrack.CineTrackApplication
+import com.example.cinetrack.data.MovieRepository
+import com.example.cinetrack.data.TmdbMovie
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+
+sealed interface DetailUiState {
+    object Loading : DetailUiState
+    data class Success(
+        val movie: TmdbMovie,
+        val isInWatchlist: Boolean = false,
+        val isWatched: Boolean = false
+    ) : DetailUiState
+    data class Error(val message: String) : DetailUiState
+}
+
+data class RatingDialogState(
+    val isVisible: Boolean = false,
+    val rating: Int = 0,
+    val review: String = ""
+)
+
+class DetailViewModel(
+    private val repository: MovieRepository,
+    private val movieId: Int
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow<DetailUiState>(DetailUiState.Loading)
+    val uiState: StateFlow<DetailUiState> = _uiState.asStateFlow()
+
+    private val _dialogState = MutableStateFlow(RatingDialogState())
+    val dialogState: StateFlow<RatingDialogState> = _dialogState.asStateFlow()
+
+    init {
+        loadMovieDetails()
+    }
+
+    private fun loadMovieDetails() {
+        viewModelScope.launch {
+            _uiState.value = DetailUiState.Loading
+            try {
+                val movie = repository.getMovieDetails(movieId)
+
+                repository.isInWatchlist(movieId).collect { inWatchlist ->
+                    repository.isWatched(movieId).collect { watched ->
+                        _uiState.value = DetailUiState.Success(
+                            movie = movie,
+                            isInWatchlist = inWatchlist,
+                            isWatched = watched
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                _uiState.value = DetailUiState.Error(e.message ?: "Eroare necunoscuta")
+            }
+        }
+    }
+
+    fun addToWatchlist() {
+        val state = _uiState.value as? DetailUiState.Success ?: return
+        viewModelScope.launch {
+            repository.addToWatchlist(state.movie)
+        }
+    }
+
+    fun removeFromWatchlist() {
+        viewModelScope.launch {
+            repository.removeFromWatchlist(movieId)
+        }
+    }
+
+    fun onMarkAsWatchedClick() {
+        _dialogState.value = RatingDialogState(isVisible = true)
+    }
+
+    fun onRatingChange(rating: Int) {
+        _dialogState.value = _dialogState.value.copy(rating = rating)
+    }
+
+    fun onReviewChange(review: String) {
+        _dialogState.value = _dialogState.value.copy(review = review)
+    }
+
+    fun onDialogDismiss() {
+        _dialogState.value = RatingDialogState()
+    }
+
+    fun onSaveWatched() {
+        val state = _uiState.value as? DetailUiState.Success ?: return
+        val dialog = _dialogState.value
+        viewModelScope.launch {
+            repository.markAsWatched(
+                movie = state.movie,
+                rating = dialog.rating,
+                review = dialog.review
+            )
+            _dialogState.value = RatingDialogState()
+        }
+    }
+
+    companion object {
+        fun provideFactory(movieId: Int): ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY]
+                        as CineTrackApplication)
+                DetailViewModel(application.repository, movieId)
+            }
+        }
+    }
+}
