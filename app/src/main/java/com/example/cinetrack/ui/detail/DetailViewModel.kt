@@ -10,9 +10,12 @@ import com.example.cinetrack.CineTrackApplication
 import com.example.cinetrack.data.MovieRepository
 import com.example.cinetrack.data.TmdbMovie
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 
 sealed interface DetailUiState {
     object Loading : DetailUiState
@@ -36,7 +39,33 @@ class DetailViewModel(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<DetailUiState>(DetailUiState.Loading)
-    val uiState: StateFlow<DetailUiState> = _uiState.asStateFlow()
+//    val uiState: StateFlow<DetailUiState> = _uiState.asStateFlow()
+
+    //
+
+    private val _movie = MutableStateFlow<TmdbMovie?>(null)
+    private val _error = MutableStateFlow<String?>(null)
+
+    // Combina cele 3 surse de date intr-un singur UiState
+    val uiState: StateFlow<DetailUiState> = combine(
+        _movie,
+        repository.isInWatchlist(movieId),
+        repository.isWatched(movieId)
+    ) { movie, inWatchlist, watched ->
+        when {
+            _error.value != null -> DetailUiState.Error(_error.value!!)
+            movie == null -> DetailUiState.Loading
+            else -> DetailUiState.Success(
+                movie = movie,
+                isInWatchlist = inWatchlist,
+                isWatched = watched
+            )
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = DetailUiState.Loading
+    )
 
     private val _dialogState = MutableStateFlow(RatingDialogState())
     val dialogState: StateFlow<RatingDialogState> = _dialogState.asStateFlow()
@@ -47,27 +76,17 @@ class DetailViewModel(
 
     private fun loadMovieDetails() {
         viewModelScope.launch {
-            _uiState.value = DetailUiState.Loading
             try {
                 val movie = repository.getMovieDetails(movieId)
-
-                repository.isInWatchlist(movieId).collect { inWatchlist ->
-                    repository.isWatched(movieId).collect { watched ->
-                        _uiState.value = DetailUiState.Success(
-                            movie = movie,
-                            isInWatchlist = inWatchlist,
-                            isWatched = watched
-                        )
-                    }
-                }
+                _movie.value = movie
             } catch (e: Exception) {
-                _uiState.value = DetailUiState.Error(e.message ?: "Eroare necunoscuta")
+                _error.value = e.message ?: "Eroare necunoscuta"
             }
         }
     }
 
     fun addToWatchlist() {
-        val state = _uiState.value as? DetailUiState.Success ?: return
+        val state = uiState.value as? DetailUiState.Success ?: return
         viewModelScope.launch {
             repository.addToWatchlist(state.movie)
         }
@@ -80,6 +99,7 @@ class DetailViewModel(
     }
 
     fun onMarkAsWatchedClick() {
+        val state = uiState.value as? DetailUiState.Success ?: return
         _dialogState.value = RatingDialogState(isVisible = true)
     }
 
@@ -96,7 +116,7 @@ class DetailViewModel(
     }
 
     fun onSaveWatched() {
-        val state = _uiState.value as? DetailUiState.Success ?: return
+        val state = uiState.value as? DetailUiState.Success ?: return
         val dialog = _dialogState.value
         viewModelScope.launch {
             repository.markAsWatched(
