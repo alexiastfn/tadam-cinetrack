@@ -10,6 +10,7 @@ import androidx.navigation.navArgument
 import com.example.cinetrack.ui.detail.DetailScreen
 import com.example.cinetrack.ui.home.HomeScreen
 import com.example.cinetrack.ui.search.SearchScreen
+import com.example.cinetrack.ui.settings.SettingsScreen
 import com.example.cinetrack.ui.watched.WatchedScreen
 import com.example.cinetrack.ui.watchlist.WatchlistScreen
 
@@ -23,6 +24,8 @@ sealed class Screen(val route: String) {
     }
 
     object Search : Screen("search")
+
+    object Settings : Screen("settings")
 }
 
 @Composable
@@ -72,6 +75,10 @@ fun CineTrackNavHost(
                     navController.navigate(Screen.Detail.createRoute(movieId))
                 }
             )
+        }
+
+        composable(Screen.Settings.route) {
+            SettingsScreen()
         }
     }
 }

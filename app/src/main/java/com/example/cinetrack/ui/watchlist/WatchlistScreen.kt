@@ -29,7 +29,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
-import com.example.cinetrack.data.WatchlistItem
+import com.example.cinetrack.data.db.WatchlistItem
 
 
 @Composable

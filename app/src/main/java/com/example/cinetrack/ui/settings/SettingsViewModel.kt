@@ -1,4 +1,5 @@
-package com.example.cinetrack.ui.watched
+package com.example.cinetrack.ui.settings
+
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -6,39 +7,35 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.cinetrack.CineTrackApplication
-import com.example.cinetrack.data.repository.MovieRepository
-import com.example.cinetrack.data.db.WatchedItem
+import com.example.cinetrack.data.settings.SettingsRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
-sealed interface WatchedUiState {
-    object Empty : WatchedUiState
-    data class Success(val items: List<WatchedItem>) : WatchedUiState
-}
-
-class WatchedViewModel(
-    private val repository: MovieRepository
+class SettingsViewModel(
+    private val settingsRepository: SettingsRepository
 ) : ViewModel() {
 
-    val uiState: StateFlow<WatchedUiState> = repository.getWatchedList()
-        .map { items ->
-            if (items.isEmpty()) WatchedUiState.Empty
-            else WatchedUiState.Success(items)
-        }
+    val isDarkTheme: StateFlow<Boolean> = settingsRepository.isDarkTheme
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = WatchedUiState.Empty
+            initialValue = false
         )
+
+    fun toggleTheme(enabled: Boolean) {
+        viewModelScope.launch {
+            settingsRepository.setDarkTheme(enabled)
+        }
+    }
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val application = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY]
                         as CineTrackApplication)
-                WatchedViewModel(application.repository)
+                SettingsViewModel(application.settingsRepository)
             }
         }
     }

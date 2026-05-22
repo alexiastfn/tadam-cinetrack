@@ -1,4 +1,4 @@
-package com.example.cinetrack.data
+package com.example.cinetrack.data.db
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -12,11 +12,11 @@ interface CineTrackDao {
 
     // --- Watchlist ---
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.Companion.IGNORE)
     suspend fun addToWatchlist(item: WatchlistItem)
 
-    @Delete
-    suspend fun removeFromWatchlist(item: WatchlistItem)
+    @Query("DELETE FROM watchlist WHERE tmdbId = :tmdbId")
+    suspend fun removeFromWatchlist(tmdbId: Int)
 
     @Query("SELECT * FROM watchlist ORDER BY addedAt DESC")
     fun getWatchlist(): Flow<List<WatchlistItem>>
@@ -26,11 +26,11 @@ interface CineTrackDao {
 
     // --- Watched ---
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
     suspend fun markAsWatched(item: WatchedItem)
 
-    @Delete
-    suspend fun removeFromWatched(item: WatchedItem)
+    @Query("DELETE FROM watched WHERE tmdbId = :tmdbId")
+    suspend fun removeFromWatched(tmdbId: Int)
 
     @Query("SELECT * FROM watched ORDER BY watchedAt DESC")
     fun getWatchedList(): Flow<List<WatchedItem>>
