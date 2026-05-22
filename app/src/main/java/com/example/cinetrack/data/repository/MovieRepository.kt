@@ -5,6 +5,7 @@ import com.example.cinetrack.data.model.TmdbMovie
 import com.example.cinetrack.data.db.WatchedItem
 import com.example.cinetrack.data.db.WatchlistItem
 import com.example.cinetrack.data.api.TmdbApiService
+import com.example.cinetrack.data.model.CastMember
 import com.example.cinetrack.data.model.Genre
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -87,5 +88,18 @@ class MovieRepository(
                 )
             )
             dao.removeFromWatchlist(movie.id)
+        }
+
+    suspend fun getCredits(movieId: Int): List<CastMember> =
+        withContext(Dispatchers.IO) {
+            api.getCredits(movieId).cast.take(10)
+        }
+
+    suspend fun getTrailerKey(movieId: Int): String? =
+        withContext(Dispatchers.IO) {
+            api.getVideos(movieId).results
+                .filter { it.site == "YouTube" && it.type == "Trailer" }
+                .maxByOrNull { it.official }
+                ?.key
         }
 }
