@@ -126,7 +126,7 @@ The API key is stored in `local.properties` and injected via `BuildConfig`
    TMDB_API_KEY=your_api_key_here
    ```
 
-4. Run the app on an emulator or physical device (API 35).
+4. Run the app on an emulator or physical device (I used Pixel 8 API 35).
 
 
 ---
