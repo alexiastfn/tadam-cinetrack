@@ -9,6 +9,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.cinetrack.ui.detail.DetailScreen
 import com.example.cinetrack.ui.home.HomeScreen
+import com.example.cinetrack.ui.search.SearchScreen
+import com.example.cinetrack.ui.watched.WatchedScreen
+import com.example.cinetrack.ui.watchlist.WatchlistScreen
 
 
 sealed class Screen(val route: String) {
@@ -18,6 +21,8 @@ sealed class Screen(val route: String) {
     object Detail : Screen("detail/{movieId}") {
         fun createRoute(movieId: Int) = "detail/$movieId"
     }
+
+    object Search : Screen("search")
 }
 
 @Composable
@@ -59,6 +64,14 @@ fun CineTrackNavHost(
             val movieId = backStackEntry.arguments?.getInt("movieId")
                 ?: error("movieId cannot be null")
             DetailScreen(movieId = movieId)
+        }
+
+        composable(Screen.Search.route) {
+            SearchScreen(
+                onMovieClick = { movieId ->
+                    navController.navigate(Screen.Detail.createRoute(movieId))
+                }
+            )
         }
     }
 }

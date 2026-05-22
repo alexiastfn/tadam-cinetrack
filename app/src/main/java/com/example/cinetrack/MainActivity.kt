@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -40,6 +41,7 @@ class MainActivity : ComponentActivity() {
 
                 val bottomNavItems = listOf(
                     BottomNavItem(Screen.Home, "Acasa", Icons.Filled.Home),
+                    BottomNavItem(Screen.Search, "Cauta", Icons.Filled.Search),
                     BottomNavItem(Screen.Watchlist, "Watchlist", Icons.Filled.List),
                     BottomNavItem(Screen.Watched, "Vazut", Icons.Filled.Star)
                 )
