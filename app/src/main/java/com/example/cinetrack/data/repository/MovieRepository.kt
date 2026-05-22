@@ -5,6 +5,7 @@ import com.example.cinetrack.data.model.TmdbMovie
 import com.example.cinetrack.data.db.WatchedItem
 import com.example.cinetrack.data.db.WatchlistItem
 import com.example.cinetrack.data.api.TmdbApiService
+import com.example.cinetrack.data.model.Genre
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
@@ -31,6 +32,11 @@ class MovieRepository(
             api.getMovieDetails(id)
         }
 
+    suspend fun getGenres(): List<Genre> =
+        withContext(Dispatchers.IO) {
+            api.getGenres().genres
+        }
+
     // --- Local (Room) ---
 
     fun getWatchlist(): Flow<List<WatchlistItem>> = dao.getWatchlist()
@@ -41,13 +47,23 @@ class MovieRepository(
 
     fun isWatched(tmdbId: Int): Flow<Boolean> = dao.isWatched(tmdbId)
 
+    private fun TmdbMovie.extractGenreIds(): List<Int> {
+        return when {
+            genreIds != null -> genreIds           // vine din /popular sau /search
+            genreObjects != null -> genreObjects.map { it.id }  // vine din /movie/{id}
+            else -> emptyList()
+        }
+    }
+
     suspend fun addToWatchlist(movie: TmdbMovie) =
         withContext(Dispatchers.IO) {
+            android.util.Log.d("REPO", "Saving genreIds: ${movie.genreIds}")
             dao.addToWatchlist(
                 WatchlistItem(
                     tmdbId = movie.id,
                     title = movie.title,
-                    posterPath = movie.posterPath
+                    posterPath = movie.posterPath,
+                    genreIds = movie.extractGenreIds()
                 )
             )
         }
@@ -59,11 +75,13 @@ class MovieRepository(
 
     suspend fun markAsWatched(movie: TmdbMovie, rating: Int, review: String) =
         withContext(Dispatchers.IO) {
+            android.util.Log.d("REPO", "Saving genreIds watched: ${movie.genreIds}")
             dao.markAsWatched(
                 WatchedItem(
                     tmdbId = movie.id,
                     title = movie.title,
                     posterPath = movie.posterPath,
+                    genreIds = movie.extractGenreIds(),
                     rating = rating,
                     review = review
                 )

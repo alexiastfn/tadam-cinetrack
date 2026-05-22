@@ -9,6 +9,7 @@ data class WatchedItem(
     val tmdbId: Int,
     val title: String,
     val posterPath: String?,
+    val genreIds: List<Int> = emptyList(),
     val rating: Int,
     val review: String,
     val watchedAt: Long = System.currentTimeMillis()

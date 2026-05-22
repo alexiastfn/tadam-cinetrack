@@ -3,6 +3,7 @@ package com.example.cinetrack.ui.watched
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,10 +13,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -37,27 +40,58 @@ fun WatchedScreen(
     viewModel: WatchedViewModel = viewModel(factory = WatchedViewModel.Factory)
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val genres by viewModel.genres.collectAsState()
+    val selectedGenreId by viewModel.selectedGenreId.collectAsState()
 
-    when (val state = uiState) {
-        is WatchedUiState.Empty -> {
-            Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(
-                    text = "Inca nu ai marcat niciun film ca vazut.",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+    Column(modifier = modifier.fillMaxSize()) {
+
+        // Filter chips genuri
+        if (genres.isNotEmpty()) {
+            LazyRow(
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                item {
+                    FilterChip(
+                        selected = selectedGenreId == null,
+                        onClick = { viewModel.setGenreFilter(null) },
+                        label = { Text("Toate") }
+                    )
+                }
+                items(genres, key = { it.id }) { genre ->
+                    FilterChip(
+                        selected = selectedGenreId == genre.id,
+                        onClick = { viewModel.setGenreFilter(genre.id) },
+                        label = { Text(genre.name) }
+                    )
+                }
             }
         }
-        is WatchedUiState.Success -> {
-            LazyColumn(
-                modifier = modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(
-                    items = state.items,
-                    key = { it.tmdbId }
-                ) { item ->
-                    WatchedItemCard(item = item)
+
+        when (val state = uiState) {
+            is WatchedUiState.Empty -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = if (selectedGenreId != null)
+                            "Niciun film din acest gen marcat ca vazut."
+                        else
+                            "Inca nu ai marcat niciun film ca vazut.",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+            is WatchedUiState.Success -> {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(state.items, key = { it.tmdbId }) { item ->
+                        WatchedItemCard(item = item,
+                            genreNames = viewModel.getGenreNames(item.genreIds))
+                    }
                 }
             }
         }
@@ -67,6 +101,7 @@ fun WatchedScreen(
 @Composable
 private fun WatchedItemCard(
     item: WatchedItem,
+    genreNames: List<String>,  // adaugat
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -90,9 +125,16 @@ private fun WatchedItemCard(
                     text = item.title,
                     style = MaterialTheme.typography.bodyLarge
                 )
+                // genuri
+                if (genreNames.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = genreNames.joinToString(" • "),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
                 Spacer(modifier = Modifier.height(4.dp))
-
-                // Stele colorate pentru rating
                 Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
                     (1..5).forEach { star ->
                         Icon(
@@ -106,8 +148,6 @@ private fun WatchedItemCard(
                         )
                     }
                 }
-
-                // Review
                 if (item.review.isNotBlank()) {
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(

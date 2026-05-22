@@ -9,5 +9,6 @@ data class WatchlistItem(
     val tmdbId: Int,
     val title: String,
     val posterPath: String?,
+    val genreIds: List<Int> = emptyList(),
     val addedAt: Long = System.currentTimeMillis()
 )
