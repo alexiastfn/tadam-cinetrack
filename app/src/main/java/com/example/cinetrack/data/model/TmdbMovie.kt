@@ -14,5 +14,7 @@ data class TmdbMovie(
     @SerializedName("vote_average")
     val voteAverage: Double,
     @SerializedName("genre_ids")
-    val genreIds: List<Int> = emptyList()
+    val genreIds: List<Int>? = null,      // din /popular si /search
+    @SerializedName("genres")
+    val genreObjects: List<GenreObject>? = null  // din /movie/{id}
 )
