@@ -4,6 +4,7 @@ import android.app.Application
 import com.example.cinetrack.data.db.CineTrackDatabase
 import com.example.cinetrack.data.repository.MovieRepository
 import com.example.cinetrack.data.api.RetrofitInstance
+import com.example.cinetrack.data.settings.SettingsRepository
 
 class CineTrackApplication : Application() {
     val database: CineTrackDatabase by lazy {
@@ -15,5 +16,9 @@ class CineTrackApplication : Application() {
             dao = database.cineTrackDao(),
             api = RetrofitInstance.api
         )
+    }
+
+    val settingsRepository: SettingsRepository by lazy {
+        SettingsRepository(this)
     }
 }

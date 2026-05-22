@@ -8,12 +8,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -33,8 +35,15 @@ data class BottomNavItem(
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val settingsRepository = (application as CineTrackApplication).settingsRepository
+
         setContent {
-            CineTrackTheme {
+
+            val isDarkTheme by settingsRepository.isDarkTheme
+                .collectAsState(initial = false)
+
+            CineTrackTheme(darkTheme = isDarkTheme) {
                 val navController = rememberNavController()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
@@ -43,7 +52,8 @@ class MainActivity : ComponentActivity() {
                     BottomNavItem(Screen.Home, "Acasa", Icons.Filled.Home),
                     BottomNavItem(Screen.Search, "Cauta", Icons.Filled.Search),
                     BottomNavItem(Screen.Watchlist, "Watchlist", Icons.Filled.List),
-                    BottomNavItem(Screen.Watched, "Vazut", Icons.Filled.Star)
+                    BottomNavItem(Screen.Watched, "Vazut", Icons.Filled.Star),
+                    BottomNavItem(Screen.Settings, "Setari", Icons.Filled.Settings)
                 )
 
                 // Ascunde bottom bar pe ecranul de detail
