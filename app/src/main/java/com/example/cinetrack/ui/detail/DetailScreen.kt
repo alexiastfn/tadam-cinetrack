@@ -2,7 +2,6 @@ package com.example.cinetrack.ui.detail
 
 import android.content.Intent
 import android.net.Uri
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -304,46 +303,33 @@ private fun TrailerButton(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+
     Button(
         onClick = {
-            val url = "https://www.google.com/search?q=${Uri.encode("$movieTitle trailer")}"
-            android.util.Log.d("TRAILER", "Trying to open: $url")
-
-            // incearca in ordine mai multe aplicatii
-            val browsers = listOf(
-                "com.android.chrome",
-                "com.google.android.googlequicksearchbox",  // Google app
-                "com.android.browser",
-                "org.mozilla.firefox"
+            val searchQuery = Uri.encode("$movieTitle trailer")
+            val intent = Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("https://www.youtube.com/results?search_query=$searchQuery")
             )
-
-            var opened = false
-            for (packageName in browsers) {
-                try {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
-                        setPackage(packageName)
-                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    }
-                    context.startActivity(intent)
-                    android.util.Log.d("TRAILER", "Opened with: $packageName")
-                    opened = true
-                    break
-                } catch (e: Exception) {
-                    android.util.Log.d("TRAILER", "Failed with $packageName: ${e.message}")
-                }
-            }
-
-            if (!opened) {
-                Toast.makeText(context, "Niciun browser disponibil", Toast.LENGTH_SHORT).show()
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            try {
+                context.startActivity(intent)
+            } catch (e: Exception) {
+                val googleIntent = Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse("https://www.google.com/search?q=${Uri.encode("$movieTitle trailer")}")
+                )
+                context.startActivity(googleIntent)
             }
         },
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
-        Text("▶ Cauta trailer")
+        Text("▶ Vezi trailer pe YouTube")
     }
 }
+
 
 @Composable
 private fun CastSection(
