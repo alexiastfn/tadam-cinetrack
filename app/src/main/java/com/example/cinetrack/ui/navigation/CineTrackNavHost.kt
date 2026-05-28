@@ -15,6 +15,7 @@ import com.example.cinetrack.ui.watched.WatchedScreen
 import com.example.cinetrack.ui.watchlist.WatchlistScreen
 
 
+// rutele
 sealed class Screen(val route: String) {
     object Home : Screen("home")
     object Watchlist : Screen("watchlist")

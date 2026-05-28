@@ -6,6 +6,7 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+// config client http
 object RetrofitInstance {
 
     private val authInterceptor = Interceptor { chain ->

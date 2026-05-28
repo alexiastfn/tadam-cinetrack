@@ -69,7 +69,7 @@ class DetailViewModel(
                 val movie = repository.getMovieDetails(movieId)
                 _movie.value = movie
 
-                // incarca cast si trailer in paralel
+                // cast si trailer in paralel
                 launch {
                     _cast.value = repository.getCredits(movieId)
                 }
@@ -83,16 +83,6 @@ class DetailViewModel(
         }
     }
 
-//    private fun loadMovieDetails() {
-//        viewModelScope.launch {
-//            try {
-//                val movie = repository.getMovieDetails(movieId)
-//                _movie.value = movie
-//            } catch (e: Exception) {
-//                _error.value = e.message ?: "Eroare necunoscuta"
-//            }
-//        }
-//    }
 
     fun addToWatchlist() {
         val state = uiState.value as? DetailUiState.Success ?: return

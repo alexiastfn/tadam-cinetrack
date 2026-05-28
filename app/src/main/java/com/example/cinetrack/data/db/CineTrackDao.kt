@@ -7,6 +7,8 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
+
+// interfata de acces la date
 @Dao
 interface CineTrackDao {
 

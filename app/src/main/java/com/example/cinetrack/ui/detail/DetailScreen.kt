@@ -284,7 +284,7 @@ private fun RatingDialog(
         confirmButton = {
             Button(
                 onClick = onSave,
-                enabled = dialogState.rating > 0  // trebuie cel putin 1 stea
+                enabled = dialogState.rating > 0  // cel putin 1 stea
             ) {
                 Text("Salveaza")
             }

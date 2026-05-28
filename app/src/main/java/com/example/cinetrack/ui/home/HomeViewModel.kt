@@ -13,13 +13,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-
-sealed interface HomeUiState {
-    data class Success(val movies: List<TmdbMovie>) : HomeUiState
-    object Loading : HomeUiState
-    data class Error(val message: String) : HomeUiState
-}
-
 class HomeViewModel(
     private val repository: MovieRepository
 ) : ViewModel() {
