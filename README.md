@@ -52,6 +52,7 @@ repository.
 | Preferences | DataStore |
 | Architecture | MVVM + Repository pattern |
 | Movie data | TMDB API |
+| Async / threading | Kotlin Coroutines + Dispatchers.IO |
 
 ---
 
